@@ -247,7 +247,11 @@ export default function Home() {
   const handleCategoryClick = (cat: '전체' | '남성' | '여성' | '제품') => {
     setActiveCategory(cat);
     setTimeout(() => {
-      imageWorksRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (cat === '전체') {
+        imageWorksRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+        document.getElementById(`series-${cat}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     }, 50);
   };
 
@@ -439,7 +443,7 @@ export default function Home() {
                   <p>정적인 출력물에서 나아가 조명, 구도, 움직임, 편집이 더해진 영상 콘텐츠로 표현 범위를 넓히고 싶다는 목표가 생겼습니다. 이후 Maya, After Effects와 ComfyUI, Midjourney, Kling 등 생성형 AI 도구를 학습하며<br />영상 콘텐츠 제작 역량을 키웠습니다.</p>
                 </div>
               </FadeIn>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 items-stretch">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-3 items-stretch">
                 {skillGroups.map((group, groupIdx) => (
                   <FadeIn key={groupIdx} delay={groupIdx * 80} className="h-full">
                     <div className="h-full bg-[#141414] border border-white/10 hover:border-white/20 p-6 transition-colors">
@@ -504,9 +508,9 @@ export default function Home() {
           </FadeIn>
 
           <div className="space-y-px mb-24">
-            {imageSeries.filter((s) => activeCategory === '전체' || s.category === activeCategory).map((series, si) => (
+            {imageSeries.map((series, si) => (
               <FadeIn key={si} delay={si * 80}>
-                <div className="p-6 bg-[#0a0a0a] border border-white/8 hover:border-white/15 transition-all">
+                <div id={`series-${series.category}`} className="p-6 bg-[#0a0a0a] border border-white/8 hover:border-white/15 transition-all">
                   <div className="flex items-start justify-between mb-4 flex-wrap gap-3">
                     <div>
                       <h4 className="text-2xl font-black text-white">{series.title}</h4>
