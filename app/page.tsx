@@ -241,6 +241,7 @@ export default function Home() {
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
   const [activeCategory, setActiveCategory] = useState<'전체' | '남성' | '여성' | '제품'>('전체');
   const [emailCopied, setEmailCopied] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const copyEmail = () => {
     navigator.clipboard.writeText('rlaxotjd0826@gmail.com');
@@ -278,21 +279,19 @@ export default function Home() {
     <div className="min-h-screen bg-black text-white overflow-x-hidden">
 
       {/* ── Nav ── */}
-      <nav className="fixed top-0 z-50 w-full overflow-hidden bg-[#FF2D00]">
-        <div className="w-full flex items-stretch" style={{ height: '56px' }}>
+      <nav className="fixed top-0 z-50 w-full bg-[#FF2D00]">
+        <div className="w-full flex items-center justify-between px-6 md:px-[8%] lg:px-[10%]" style={{ height: '56px' }}>
           {/* 로고 */}
           <a
             href="#home"
-            className="flex items-center flex-shrink-0 pl-6 md:pl-[8%] lg:pl-[10%] pr-8 text-xl font-black tracking-widest text-white hover:text-black transition-colors z-10"
+            onClick={() => setMenuOpen(false)}
+            className="text-xl font-black tracking-widest text-white hover:text-black transition-colors"
           >
             KTS
           </a>
 
-          {/* 중앙 여백 */}
-          <div className="flex-1" />
-
-          {/* 메뉴 */}
-          <div className="flex items-center gap-10 flex-shrink-0 pl-8 pr-6 md:pr-[8%] lg:pr-[10%] z-10">
+          {/* 데스크탑 메뉴 */}
+          <div className="hidden md:flex items-center gap-10">
             {[
               { label: 'About', href: '#about' },
               { label: 'Projects', href: '#projects' },
@@ -309,8 +308,51 @@ export default function Home() {
               </a>
             ))}
           </div>
+
+          {/* 햄버거 버튼 (모바일) */}
+          <button
+            onClick={() => setMenuOpen((o) => !o)}
+            className="md:hidden flex flex-col justify-center items-center w-8 h-8 gap-1.5 z-[60]"
+            aria-label="메뉴"
+          >
+            <span className={`block w-6 h-0.5 bg-white transition-all duration-300 origin-center ${menuOpen ? 'rotate-45 translate-y-2' : ''}`} />
+            <span className={`block w-6 h-0.5 bg-white transition-all duration-300 ${menuOpen ? 'opacity-0 scale-x-0' : ''}`} />
+            <span className={`block w-6 h-0.5 bg-white transition-all duration-300 origin-center ${menuOpen ? '-rotate-45 -translate-y-2' : ''}`} />
+          </button>
         </div>
       </nav>
+
+      {/* 모바일 풀스크린 메뉴 */}
+      <div
+        className={`fixed inset-0 z-40 bg-[#FF2D00] flex flex-col justify-center px-10 transition-all duration-500 md:hidden ${
+          menuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+      >
+        <nav className="flex flex-col gap-2">
+          {[
+            { label: 'About', href: '#about', sub: '소개' },
+            { label: 'Projects', href: '#projects', sub: '작업물' },
+            { label: 'Career', href: '#career', sub: '경력 & 이력' },
+            { label: 'Contact', href: '#contact', sub: '연락처' },
+          ].map(({ label, href, sub }, i) => (
+            <a
+              key={href}
+              href={href}
+              onClick={() => setMenuOpen(false)}
+              className="group flex items-baseline gap-4 py-5 border-b border-white/20 transition-all"
+              style={{ transitionDelay: menuOpen ? `${i * 60}ms` : '0ms' }}
+            >
+              <span
+                className="font-black italic uppercase leading-none text-white group-hover:text-black transition-colors"
+                style={{ fontSize: 'clamp(32px, 9vw, 80px)', fontFamily: "'Barlow Condensed', sans-serif" }}
+              >
+                {label}
+              </span>
+              <span className="text-white/50 text-lg font-medium group-hover:text-black/50 transition-colors">{sub}</span>
+            </a>
+          ))}
+        </nav>
+      </div>
 
       {/* ── Hero ── */}
       <section id="home" className="relative min-h-screen flex flex-col justify-end overflow-hidden">
@@ -432,14 +474,14 @@ export default function Home() {
 
           {/* Image Works */}
           <FadeIn>
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex flex-col gap-3 mb-4">
               <p className="text-xl font-black italic tracking-tight text-gray-500 uppercase" style={{ fontFamily: "'Barlow Condensed', sans-serif" }}>Image Works</p>
-              <div className="flex gap-2">
+              <div className="flex gap-2 flex-wrap">
                 {(['전체', '남성', '여성', '제품'] as const).map((cat) => (
                   <button
                     key={cat}
                     onClick={() => setActiveCategory(cat)}
-                    className={`px-4 py-1.5 text-lg font-bold tracking-wider transition-all ${
+                    className={`px-5 py-2 text-base font-bold tracking-wider transition-all ${
                       activeCategory === cat
                         ? 'bg-[#FF2D00] text-white'
                         : 'border border-white/20 text-gray-500 hover:border-white/50 hover:text-white'
@@ -502,7 +544,7 @@ export default function Home() {
                   onClick={() => setActiveVideo(p.videoId)}
                 >
                   <span className="text-lg text-gray-700 font-mono w-6 flex-shrink-0">{String(i + 1).padStart(2, '0')}</span>
-                  <div className="relative w-36 aspect-video flex-shrink-0 overflow-hidden bg-white/5">
+                  <div className="relative w-20 md:w-36 aspect-video flex-shrink-0 overflow-hidden bg-white/5">
                     <img
                       src={`https://img.youtube.com/vi/${p.videoId}/hqdefault.jpg`}
                       alt={p.title}
