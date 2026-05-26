@@ -1,0 +1,33 @@
+version: 2
+
+updates:
+  # npm 패키지 자동 업데이트 (Next.js, React 등)
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Seoul"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+    commit-message:
+      prefix: "chore"
+    ignore:
+      # 메이저 버전 업데이트는 수동으로 검토 (breaking change 위험)
+      - dependency-name: "next"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react-dom"
+        update-types: ["version-update:semver-major"]
+
+  # GitHub Actions 자동 업데이트 (나중에 CI/CD 추가 시 대비)
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+      timezone: "Asia/Seoul"
+    labels:
+      - "dependencies"
