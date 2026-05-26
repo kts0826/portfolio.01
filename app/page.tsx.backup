@@ -1,0 +1,751 @@
+'use client';
+
+import { useEffect, useState, useRef } from 'react';
+
+const TYPING_TEXTS = [
+  'AI 콘텐츠 크리에이터',
+  '3D 아티스트',
+  'VFX 영상 제작자',
+  'AI 이미지 생성자',
+];
+
+function useTypingEffect(texts: string[], speed = 80, pause = 1800) {
+  const [displayed, setDisplayed] = useState('');
+  const [textIdx, setTextIdx] = useState(0);
+  const [charIdx, setCharIdx] = useState(0);
+  const [deleting, setDeleting] = useState(false);
+
+  useEffect(() => {
+    const current = texts[textIdx];
+    let timeout: ReturnType<typeof setTimeout>;
+
+    if (!deleting && charIdx < current.length) {
+      timeout = setTimeout(() => setCharIdx((c) => c + 1), speed);
+    } else if (!deleting && charIdx === current.length) {
+      timeout = setTimeout(() => setDeleting(true), pause);
+    } else if (deleting && charIdx > 0) {
+      timeout = setTimeout(() => setCharIdx((c) => c - 1), speed / 2);
+    } else if (deleting && charIdx === 0) {
+      setDeleting(false);
+      setTextIdx((i) => (i + 1) % texts.length);
+    }
+    setDisplayed(current.slice(0, charIdx));
+    return () => clearTimeout(timeout);
+  }, [charIdx, deleting, textIdx, texts, speed, pause]);
+
+  return displayed;
+}
+
+function useInView(threshold = 0.12) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setInView(true); },
+      { threshold }
+    );
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [threshold]);
+  return { ref, inView };
+}
+
+function FadeIn({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
+  const { ref, inView } = useInView();
+  return (
+    <div
+      ref={ref}
+      style={{ transitionDelay: `${delay}ms` }}
+      className={`transition-all duration-700 ${inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} ${className}`}
+    >
+      {children}
+    </div>
+  );
+}
+
+const skillGroups = [
+  {
+    category: '디자인 툴',
+    emoji: '🎨',
+    gradient: 'from-sky-400/15 to-blue-500/15',
+    tools: [
+      { name: 'Photoshop', color: 'from-sky-400 to-blue-500', gradient: 'from-sky-400/10 to-blue-500/10', logoPath: '/logos/photoshop.png' },
+      { name: 'Illustrator', color: 'from-yellow-500 to-amber-600', gradient: 'from-yellow-500/10 to-amber-600/10', logoPath: '/logos/illustrator.svg' },
+    ]
+  },
+  {
+    category: 'AI 툴',
+    emoji: '🤖',
+    gradient: 'from-violet-500/15 to-purple-600/15',
+    tools: [
+      { name: 'ComfyUI', color: 'from-violet-500 to-purple-600', gradient: 'from-violet-500/10 to-purple-600/10', logoPath: '/logos/comfyui.png' },
+      { name: 'Midjourney', color: 'from-blue-500 to-cyan-500', gradient: 'from-blue-500/10 to-cyan-500/10', logoPath: '/logos/midjourney.png' },
+      { name: 'Kling', color: 'from-pink-500 to-rose-600', gradient: 'from-pink-500/10 to-rose-600/10', logoPath: '/logos/kling.png' },
+    ]
+  },
+  {
+    category: '3D 툴',
+    emoji: '🎲',
+    gradient: 'from-amber-500/15 to-orange-600/15',
+    tools: [
+      { name: 'Maya', color: 'from-amber-500 to-orange-600', gradient: 'from-amber-500/10 to-orange-600/10', logoPath: '/logos/maya.svg' },
+      { name: 'Substance Painter', color: 'from-orange-500 to-red-500', gradient: 'from-orange-500/10 to-red-500/10', logoPath: '/logos/substance-painter.svg' },
+    ]
+  },
+  {
+    category: '영상편집',
+    emoji: '🎬',
+    gradient: 'from-indigo-500/15 to-blue-600/15',
+    tools: [
+      { name: 'After Effects', color: 'from-indigo-500 to-blue-600', gradient: 'from-indigo-500/10 to-blue-600/10', logoPath: '/logos/aftereffects.png' },
+    ]
+  },
+];
+
+const imageSeries = [
+  {
+    category: '남성' as const,
+    title: "Men's",
+    subtitle: '남성 패션 · 포멀 · 아웃도어',
+    description: '스튜디오 포멀룩부터 도심 거리, 통나무집, 캠프파이어까지 남성의 다양한 무드를 담은 시리즈.',
+    images: [
+      { src: '/works/studio-m/그레이_포멀_스튜디오.png', pos: '50% 0%' },
+      { src: '/works/lifestyle-m/베이지_트렌치_도심.png', pos: '50% 0%' },
+      { src: '/works/lifestyle-m/네이비_캐주얼_로그캐빈.png', pos: '50% 0%' },
+      { src: '/works/formal-outdoor/브라운_캠핑_캠프파이어.png', pos: '50% 20%' },
+    ],
+    gradient: 'from-sky-500/15 to-slate-600/15',
+    border: 'border-sky-500/40 hover:border-sky-400/70',
+    glow: 'hover:shadow-sky-500/25',
+    tags: ['ComfyUI', 'AI 이미지', '패션', '룩북'],
+  },
+  {
+    category: '여성' as const,
+    title: "Women's",
+    subtitle: '여성 패션 · 스튜디오 · 시티',
+    description: '블랙 스튜디오 무드부터 도시 빌딩 앞 수트룩, 스트리트 데님까지 여성 패션 시리즈.',
+    images: [
+      { src: '/works/mood-w/블랙수트_에지_스튜디오.png', pos: '50% 0%' },
+      { src: '/works/mood-w/블랙레더_볼드_스튜디오.png', pos: '50% 0%' },
+      { src: '/works/lifestyle-w/베이지_수트_시티.png', pos: '50% 0%' },
+      { src: '/works/lifestyle-w/데님_캐주얼_스트리트.png', pos: '50% 0%' },
+    ],
+    gradient: 'from-rose-500/15 to-pink-600/15',
+    border: 'border-rose-500/40 hover:border-rose-400/70',
+    glow: 'hover:shadow-rose-500/25',
+    tags: ['ComfyUI', 'AI 이미지', '화보', '포트레이트'],
+  },
+  {
+    category: '제품' as const,
+    title: 'Product',
+    subtitle: '제품 상세페이지 · 광고 이미지',
+    description: 'ChatGPT로 제작한 향수·시계 제품 광고 이미지 및 상세페이지 시리즈.',
+    images: [
+      { src: '/works/product/향수_매거진_커버.png', pos: '50% 0%' },
+      { src: '/works/product/향수_상세페이지_01.png', pos: '50% 0%' },
+      { src: '/works/product/향수_상세페이지_02.png', pos: '50% 0%' },
+      { src: '/works/product/시계_상세페이지.png', pos: '50% 0%' },
+    ],
+    gradient: 'from-amber-500/15 to-orange-600/15',
+    border: 'border-amber-500/40 hover:border-amber-400/70',
+    glow: 'hover:shadow-amber-500/25',
+    tags: ['ChatGPT', 'AI 이미지', '제품 페이지', '상세 페이지', '브랜딩'],
+  },
+];
+
+const projects = [
+  {
+    emoji: '🏆',
+    title: '고혼진 AI 영상 광고 공모전',
+    videoId: 'kQZmfpYMg0o',
+    videoTitle: '비가 머문 자리, 아름다움이 피어나다.',
+    description: '빗방울이 머문 자리, 더 맑고 깊은 빛이 피어납니다. 자연의 순수함과 전통의 지혜가 오늘의 피부에 스며드는 30초의 이야기.\n\n덧없는 순간이 아닌, 영원히 남겨지는 아름다움의 기록입니다.',
+    tags: ['Midjourney', 'After Effects', 'Photoshop'],
+    gradient: 'from-amber-500/15 to-orange-600/15',
+    border: 'border-amber-500/40 hover:border-amber-400/70',
+    glow: 'hover:shadow-amber-500/25',
+    badge: '공모전 참가',
+  },
+  {
+    emoji: '🎬',
+    title: '체인소맨 레제편 엔딩 크레딧 뮤비',
+    videoId: '3adHcGwlMDI',
+    videoTitle: '체인소맨 : 레제편 엔딩크레딧 뮤비',
+    description: '극장판 엔딩 크레딧의 아쉬움에서 출발해, 크레딧 구간을 영화의 여운이 다시 살아나는 시각적 공간으로 재구성했습니다.\n\n라인아트 기반의 절제된 스타일로 인물의 감정을 중심에 두고, 음악의 호흡에 맞춰 장면 전환을 설계했습니다.',
+    tags: ['ComfyUI', 'Midjourney', 'After Effects', 'Photoshop'],
+    gradient: 'from-violet-500/15 to-purple-600/15',
+    border: 'border-violet-500/40 hover:border-violet-400/70',
+    glow: 'hover:shadow-violet-500/25',
+    badge: '애니메이션',
+  },
+  {
+    emoji: '🎯',
+    title: '지역주력 산업 AI영상 콘텐츠 공모전',
+    videoId: 'FoA3ChT13xE',
+    videoTitle: 'To The Next, Ulsan',
+    description: 'AI 도구로 스토리보드를 설계하고, ComfyUI로 이미지와 영상을 생성해 울산 지역 주력산업인 수소차·전기차 부품 분야를 시각화한 홍보 콘텐츠입니다.\n\n중소벤처기업부 주관 2025 지역주력산업 영상 콘텐츠 공모전 출품작입니다.',
+    tags: ['ComfyUI', 'AI 영상', '공모전'],
+    gradient: 'from-cyan-500/15 to-blue-600/15',
+    border: 'border-cyan-500/40 hover:border-cyan-400/70',
+    glow: 'hover:shadow-cyan-500/25',
+    badge: '공모전 참가',
+  },
+];
+
+const certifications = [
+  { name: 'AI-POT 1급', org: '한국생산성본부', year: '2025.08', color: 'text-violet-400' },
+  { name: '컴퓨터그래픽스운용기능사', org: '한국산업인력공단', year: '2024.12', color: 'text-pink-400' },
+  { name: '운전 면허 1종 보통', org: '도로교통공단', year: '2017.08', color: 'text-blue-400' },
+  { name: 'MOS Master', org: 'Microsoft', year: '2024.11', color: 'text-cyan-400' },
+  { name: '전산응용기계제도기능사', org: '한국산업인력공단', year: '2020.10', color: 'text-amber-400' },
+  { name: '기계가공조립기능사', org: '한국산업인력공단', year: '2016.07', color: 'text-green-400' },
+];
+
+const timeline = [
+  {
+    period: '2025.10 — 2025.11',
+    title: 'ComfyUI × 나노바나나 완전정복',
+    org: 'Fast Campus',
+    desc: 'ComfyUI, Kontext node, Nanobanana node 활용법 및 AI 맥락 편집 영상 제작 기법 습득.',
+    type: 'edu',
+  },
+  {
+    period: '2025.10 — 2025.11',
+    title: '2025 청년 도전 지원 사업',
+    org: '고용노동부',
+    desc: '단기 2기 청년 도전지원사업 프로그램 참여.\n\n· 진로 탐색 — 직업 가치관 탐색, 자기소개서 작성 및 면접 준비\n· 직업 체험 — 중장비, 제과제빵, 엑셀\n· 직업 적성 검사 — 직업 심리검사, CST검사, TCI 검사',
+    type: 'activity',
+  },
+  {
+    period: '2025.08 — 2025.12',
+    title: '공모전 참가',
+    org: '고혼진리퍼블릭 · 중소벤처기업부',
+    desc: '· 고혼진 Timeless Beauty AI 광고 공모전 (0:30)\n· 2025 지역주력 산업 AI영상 콘텐츠 공모전\n\nAI 툴과 영상 편집 역량을 실전 결과물로 연결.',
+    type: 'award',
+  },
+  {
+    period: '2024.06 — 2025.01',
+    title: 'MAYA/CG 학과 수업',
+    org: 'SBS 컴퓨터 아트학원 (울산)',
+    desc: 'Adobe Photoshop, Illustrator, After Effects, Maya 교육 이수.\n3D 모델링에서 영상 제작까지 CG 파이프라인 전반을 학습하고 포트폴리오 제작까지.',
+    type: 'edu',
+  },
+  {
+    period: '2021.10 — 2024.05',
+    title: '개발팀 주임',
+    org: '3D 프린팅 기업 (2년 7개월)',
+    desc: '3D 기구 모델링 및 2D 도면 작업, 자사 3D 프린터 설계·제작·출력·AS, 자동차 그립퍼 설계, 울산대학교 연계 3D 프린터 교육 진행.',
+    type: 'work',
+  },
+];
+
+const typeColors: Record<string, string> = {
+  work: 'border-pink-400 bg-pink-500/20',
+  edu: 'border-cyan-400 bg-cyan-500/20',
+  award: 'border-amber-400 bg-amber-500/20',
+  activity: 'border-green-400 bg-green-500/20',
+  military: 'border-gray-400 bg-gray-500/20',
+};
+const typeLabels: Record<string, string> = {
+  work: '경력',
+  edu: '교육',
+  award: '공모전',
+  activity: '대외활동',
+  military: '병역',
+};
+const typeLabelColors: Record<string, string> = {
+  work: 'text-pink-400',
+  edu: 'text-cyan-400',
+  award: 'text-amber-400',
+  activity: 'text-green-400',
+  military: 'text-gray-400',
+};
+
+export default function Home() {
+  useTypingEffect(TYPING_TEXTS);
+  const [navScrolled, setNavScrolled] = useState(false);
+  const [activeVideo, setActiveVideo] = useState<string | null>(null);
+  const [lightboxImage, setLightboxImage] = useState<string | null>(null);
+  const [activeCategory, setActiveCategory] = useState<'전체' | '남성' | '여성' | '제품'>('전체');
+  const [zoomed, setZoomed] = useState(false);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const dragRef = useRef<{ startX: number; startY: number; panX: number; panY: number } | null>(null);
+  const hasDragged = useRef(false);
+
+  useEffect(() => {
+    const onScroll = () => setNavScrolled(window.scrollY > 40);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  const closeLightbox = () => {
+    setLightboxImage(null);
+    setZoomed(false);
+    setPan({ x: 0, y: 0 });
+  };
+
+  const handleImgClick = () => {
+    if (hasDragged.current) { hasDragged.current = false; return; }
+    if (zoomed) setPan({ x: 0, y: 0 });
+    setZoomed((z) => !z);
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!zoomed) return;
+    hasDragged.current = false;
+    dragRef.current = { startX: e.clientX, startY: e.clientY, panX: pan.x, panY: pan.y };
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!dragRef.current) return;
+    const dx = e.clientX - dragRef.current.startX;
+    const dy = e.clientY - dragRef.current.startY;
+    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) hasDragged.current = true;
+    setPan({ x: dragRef.current.panX + dx, y: dragRef.current.panY + dy });
+  };
+
+  const handleMouseUp = () => { dragRef.current = null; };
+
+  return (
+    <div className="min-h-screen bg-[#080818] text-white overflow-x-hidden">
+      {/* Nav */}
+      <nav className={`fixed top-0 z-50 w-full transition-all duration-300 ${navScrolled ? 'backdrop-blur-md bg-[#080818]/80 border-b border-white/10 shadow-lg' : 'bg-transparent'}`}>
+        <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+          <span className="text-lg font-black tracking-widest bg-gradient-to-r from-violet-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
+            KTS
+          </span>
+          <div className="flex gap-8 text-sm font-medium">
+            {[
+              { label: 'Home', href: '#home' },
+              { label: 'About', href: '#about' },
+              { label: 'Projects', href: '#projects' },
+              { label: 'Career', href: '#career' },
+              { label: 'Contact', href: '#contact' },
+            ].map(({ label, href }) => (
+              <a key={href} href={href} className="text-gray-400 hover:text-white transition-colors">
+                {label}
+              </a>
+            ))}
+          </div>
+        </div>
+      </nav>
+
+      {/* ── Hero ── */}
+      <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-20 left-10 w-[500px] h-[500px] bg-violet-600/25 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-20 right-10 w-[500px] h-[500px] bg-pink-600/20 rounded-full blur-3xl animate-pulse [animation-delay:1s]" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-cyan-500/10 rounded-full blur-3xl animate-pulse [animation-delay:2s]" />
+        </div>
+        <div className="absolute inset-0 opacity-[0.035]" style={{ backgroundImage: 'linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px)', backgroundSize: '60px 60px' }} />
+
+        <div className="relative z-10 text-center max-w-5xl mx-auto px-6 pt-20">
+          <div className="mb-6 inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm text-sm text-gray-300">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            3D Modeling · AI Content Creator
+          </div>
+
+          <h1 className="text-7xl md:text-9xl font-black mb-6 leading-none tracking-tight">
+            <span className="block text-white">김태성</span>
+            <span className="block mt-2 bg-gradient-to-r from-violet-400 via-pink-500 to-cyan-400 bg-clip-text text-transparent">
+              AI 콘텐츠<br />크리에이터
+            </span>
+          </h1>
+
+          <p className="text-lg md:text-xl text-gray-400 mb-12 max-w-2xl mx-auto leading-relaxed">
+            3D 모델링 실무 경험을 바탕으로, Maya와 After Effects, AI 제작 도구를 활용해 입체적인 시각 콘텐츠를 만들어가는 인재입니다.
+          </p>
+
+          <div className="flex gap-4 justify-center flex-wrap">
+            <a href="#projects" className="px-8 py-3.5 rounded-full bg-gradient-to-r from-violet-500 via-pink-500 to-cyan-500 hover:brightness-110 transition-all font-semibold hover:scale-105 active:scale-95 shadow-lg shadow-violet-500/30">
+              작품 보기
+            </a>
+            <a href="#career" className="px-8 py-3.5 rounded-full border border-white/20 text-gray-300 hover:bg-white/5 hover:border-white/40 transition-all font-semibold hover:scale-105">
+              이력서, 자기소개서
+            </a>
+          </div>
+        </div>
+
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce opacity-40">
+          <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center pt-2">
+            <div className="w-1 h-2 bg-white rounded-full animate-pulse" />
+          </div>
+        </div>
+      </section>
+
+      {/* ── About ── */}
+      <section id="about" className="py-32">
+        <div className="max-w-6xl mx-auto px-6">
+          <FadeIn>
+            <p className="text-sm font-bold tracking-[0.3em] text-violet-400 uppercase mb-4">About Me</p>
+          </FadeIn>
+          <FadeIn>
+            <div className="max-w-3xl mb-16">
+              <h3 className="text-4xl md:text-5xl font-black mb-8 leading-tight">
+                <span className="block">정적인 결과물에서</span>
+                <span className="block bg-gradient-to-r from-violet-400 to-pink-400 bg-clip-text text-transparent">
+                  움직이는 콘텐츠로
+                </span>
+              </h3>
+              <div className="space-y-4 text-gray-400 text-base leading-relaxed" style={{ wordBreak: 'keep-all' }}>
+                <p>
+                  어릴 때부터 무언가를 직접 만들고, 그것이 눈에 보이는 결과물로 완성되는 순간에 큰 즐거움을 느껴왔습니다.
+                  3D 프린팅 기업에서 3D 모델링과 출력 업무를 수행하며 아이디어를 입체적인 결과물로 구현하는 실무 경험을 쌓았습니다.
+                </p>
+                <p>
+                  정적인 출력물에서 나아가 조명, 구도, 움직임, 편집이 더해진 영상 콘텐츠로 표현 범위를 넓히고 싶다는 목표가 생겼습니다.
+                  이후 Maya, After Effects와 ComfyUI, Midjourney, Kling 등 생성형 AI 도구를 학습하며 영상 콘텐츠 제작 역량을 키웠습니다.
+                </p>
+              </div>
+            </div>
+          </FadeIn>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+            {skillGroups.map((group, groupIdx) => (
+              <FadeIn key={groupIdx} delay={groupIdx * 80}>
+                <div className={`h-full p-5 rounded-2xl bg-gradient-to-br ${group.gradient} border border-white/10 hover:border-white/20 transition-all`}>
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="text-xl">{group.emoji}</span>
+                    <h4 className="font-bold text-sm text-white">{group.category}</h4>
+                  </div>
+                  <div className="flex flex-col gap-2.5">
+                    {group.tools.map((tool) => (
+                      <div
+                        key={tool.name}
+                        className={`p-3 rounded-xl bg-gradient-to-br ${tool.gradient} border border-white/10 hover:border-white/25 transition-all hover:scale-[1.03] hover:shadow-lg cursor-default flex items-center gap-2.5`}
+                      >
+                        <img
+                          src={tool.logoPath}
+                          alt={tool.name}
+                          className="w-7 h-7 object-contain rounded-md flex-shrink-0"
+                        />
+                        <p className="font-bold text-lg text-white leading-tight min-w-0">{tool.name}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </FadeIn>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Projects ── */}
+      <section id="projects" className="py-32 relative">
+        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-violet-600/8 rounded-full blur-3xl pointer-events-none" />
+        <div className="max-w-6xl mx-auto px-6 relative">
+          <FadeIn>
+            <p className="text-sm font-bold tracking-[0.3em] text-pink-400 uppercase mb-4">Projects</p>
+            <h3 className="text-4xl md:text-5xl font-black mb-16">
+              주요{' '}
+              <span className="bg-gradient-to-r from-pink-400 to-violet-400 bg-clip-text text-transparent">작업물</span>
+            </h3>
+          </FadeIn>
+
+          {/* 이미지 작업물 */}
+          <FadeIn>
+            <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
+              <p className="text-xs font-bold tracking-[0.25em] text-rose-400 uppercase">Image Works</p>
+              <div className="flex gap-2">
+                {(['전체', '남성', '여성', '제품'] as const).map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => setActiveCategory(cat)}
+                    className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                      activeCategory === cat
+                        ? 'bg-gradient-to-r from-violet-500 to-pink-500 text-white shadow-lg shadow-violet-500/25'
+                        : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white border border-white/10'
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </FadeIn>
+          <div className="space-y-6 mb-20">
+            {imageSeries.filter((s) => activeCategory === '전체' || s.category === activeCategory).map((series, si) => (
+              <FadeIn key={si} delay={si * 80}>
+                <div className={`p-6 rounded-2xl bg-gradient-to-br ${series.gradient} border ${series.border} transition-all hover:shadow-2xl ${series.glow}`}>
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <h4 className="text-xl font-black text-white">{series.title}</h4>
+                      <p className="text-sm text-gray-400 mt-0.5">{series.subtitle}</p>
+                    </div>
+                    <div className="flex gap-2">
+                      {series.tags.map((tag) => (
+                        <span key={tag} className="px-3 py-1 text-xs rounded-full bg-white/8 text-gray-300 border border-white/10">{tag}</span>
+                      ))}
+                    </div>
+                  </div>
+                  <p className="text-gray-400 text-sm mb-5" style={{ wordBreak: 'keep-all' }}>{series.description}</p>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {series.images.map((img, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setLightboxImage(img.src)}
+                        className="relative aspect-[2/3] rounded-xl overflow-hidden group/img cursor-pointer"
+                      >
+                        <img
+                          src={img.src}
+                          alt={`${series.title} ${idx + 1}`}
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover/img:scale-105"
+                          style={{ objectPosition: img.pos }}
+                        />
+                        <div className="absolute inset-0 bg-black/0 group-hover/img:bg-black/20 transition-colors duration-300 flex items-center justify-center">
+                          <svg className="w-8 h-8 text-white opacity-0 group-hover/img:opacity-100 transition-opacity duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                          </svg>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </FadeIn>
+            ))}
+          </div>
+
+          {/* 영상 작업물 */}
+          <FadeIn>
+            <p className="text-xs font-bold tracking-[0.25em] text-pink-400 uppercase mb-6">Video Works</p>
+          </FadeIn>
+          <div className="grid md:grid-cols-3 gap-6">
+            {projects.map((p, i) => (
+              <FadeIn key={i} delay={i * 100}>
+                <div className={`group h-full rounded-2xl bg-gradient-to-br ${p.gradient} border ${p.border} transition-all hover:shadow-2xl ${p.glow} hover:-translate-y-2 overflow-hidden`}>
+                  {p.videoId && (
+                    <button
+                      onClick={() => setActiveVideo(p.videoId)}
+                      className="relative block w-full aspect-video overflow-hidden group/thumb cursor-pointer"
+                    >
+                      <img
+                        src={`https://img.youtube.com/vi/${p.videoId}/hqdefault.jpg`}
+                        alt={p.title}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover/thumb:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center transition-colors duration-300 group-hover/thumb:bg-black/20">
+                        <div className="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center shadow-xl transition-transform duration-200 group-hover/thumb:scale-110">
+                          <svg className="w-6 h-6 text-gray-900 ml-1" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M8 5v14l11-7z" />
+                          </svg>
+                        </div>
+                      </div>
+                    </button>
+                  )}
+                  <div className="p-8">
+                    <div className="flex items-start justify-between mb-5">
+                      <span className="text-4xl">{p.emoji}</span>
+                      <span className="text-xs px-2 py-1 rounded-full bg-white/10 text-gray-400 border border-white/10">
+                        {p.badge}
+                      </span>
+                    </div>
+                    <h4 className="text-lg font-bold mb-3 group-hover:text-white transition-colors leading-snug">{p.title}</h4>
+                    {'videoTitle' in p && p.videoTitle ? (
+                      <div className="mb-5 space-y-3">
+                        <div>
+                          <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">영상제목</span>
+                          <p className="text-sm font-semibold text-white mt-0.5 leading-snug" style={{ wordBreak: 'keep-all' }}>{p.videoTitle as string}</p>
+                        </div>
+                        <div className="space-y-2">
+                          {p.description.split('\n\n').map((para, idx) => (
+                            <p key={idx} className="text-gray-400 text-xs leading-relaxed" style={{ wordBreak: 'keep-all' }}>{para}</p>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-gray-400 text-sm leading-relaxed mb-5">{p.description}</p>
+                    )}
+                    <div className="flex flex-wrap gap-2">
+                      {p.tags.map((tag) => (
+                        <span key={tag} className="px-3 py-1 text-xs rounded-full bg-white/8 text-gray-300 border border-white/10">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </FadeIn>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Career ── */}
+      <section id="career" className="py-32">
+        <div className="max-w-4xl mx-auto px-6">
+          <FadeIn>
+            <p className="text-sm font-bold tracking-[0.3em] text-cyan-400 uppercase mb-4">Career & Education</p>
+            <h3 className="text-4xl md:text-5xl font-black mb-16">
+              경력 &{' '}
+              <span className="bg-gradient-to-r from-cyan-400 to-violet-400 bg-clip-text text-transparent">이력</span>
+            </h3>
+          </FadeIn>
+
+          <div className="relative">
+            <div className="absolute left-6 top-2 bottom-2 w-px bg-gradient-to-b from-violet-500 via-pink-500 to-cyan-500 opacity-25" />
+            <div className="space-y-6">
+              {timeline.map((item, i) => (
+                <FadeIn key={i} delay={i * 80}>
+                  <div className="flex gap-6 pl-16 relative">
+                    <div className={`absolute left-[18px] top-2 w-4 h-4 rounded-full border-2 ${typeColors[item.type]}`} />
+                    <div className="flex-1 p-6 rounded-2xl bg-white/[0.03] border border-white/8 hover:border-white/15 hover:bg-white/[0.05] transition-all">
+                      <div className="flex items-center gap-3 mb-1 flex-wrap">
+                        <span className={`text-xs font-bold uppercase tracking-wider ${typeLabelColors[item.type]}`}>
+                          {typeLabels[item.type]}
+                        </span>
+                        <span className="text-xs font-mono text-gray-600">{item.period}</span>
+                      </div>
+                      <h4 className="text-lg font-bold mb-0.5 break-keep">{item.title}</h4>
+                      <p className={`text-sm mb-3 break-keep ${typeLabelColors[item.type]}`}>{item.org}</p>
+                      {item.desc && <p className="text-gray-400 text-sm leading-relaxed break-keep whitespace-pre-line">{item.desc}</p>}
+                    </div>
+                  </div>
+                </FadeIn>
+              ))}
+            </div>
+          </div>
+
+          {/* Certifications */}
+          <FadeIn>
+            <div className="mt-20">
+              <p className="text-sm font-bold tracking-[0.3em] text-amber-400 uppercase mb-8">Certifications</p>
+              <div className="grid sm:grid-cols-2 gap-4">
+                {certifications.map((cert, i) => (
+                  <div key={i} className="flex items-center gap-4 p-4 rounded-xl bg-white/[0.03] border border-white/8 hover:border-white/15 transition-all">
+                    <div className="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-bold text-sm text-white truncate">{cert.name}</p>
+                      <p className="text-xs text-gray-500">{cert.org}</p>
+                    </div>
+                    <span className="text-xs font-mono text-gray-600 flex-shrink-0">{cert.year}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </FadeIn>
+        </div>
+      </section>
+
+      {/* ── Contact ── */}
+      <section id="contact" className="py-32 relative">
+        <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-pink-600/8 rounded-full blur-3xl pointer-events-none" />
+        <div className="max-w-3xl mx-auto px-6 text-center relative">
+          <FadeIn>
+            <p className="text-sm font-bold tracking-[0.3em] text-pink-400 uppercase mb-4">Contact</p>
+            <h3 className="text-4xl md:text-6xl font-black mb-6">
+              함께 성장할<br />
+              <span className="bg-gradient-to-r from-violet-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
+                기회를 기다립니다
+              </span>
+            </h3>
+            <p className="text-gray-400 text-lg mb-12 leading-relaxed break-keep">
+              3D 모델링, 영상 제작, AI 콘텐츠 제작 분야에서 함께 성장할 수 있는 기회를 찾고 있습니다.<br />
+              포트폴리오와 관련해 궁금한 점이 있다면 편하게 연락 주세요.
+            </p>
+
+            <div className="flex gap-4 justify-center flex-wrap">
+              <a
+                href="mailto:rlaxotjd0826@gmail.com"
+                className="px-8 py-4 rounded-full bg-gradient-to-r from-violet-500 via-pink-500 to-cyan-500 hover:brightness-110 transition-all font-semibold text-lg hover:scale-105 active:scale-95 shadow-xl shadow-violet-500/25"
+              >
+                📧 이메일 보내기
+              </a>
+              <a
+                href="https://github.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-8 py-4 rounded-full border border-white/20 text-gray-300 hover:bg-white/5 hover:border-white/40 transition-all font-semibold text-lg hover:scale-105"
+              >
+                💼 GitHub
+              </a>
+            </div>
+
+            <div className="mt-24 pt-10 border-t border-white/8 text-gray-600 text-sm">
+              © 2026 Kim Tae-Sung. All rights reserved.
+            </div>
+          </FadeIn>
+        </div>
+      </section>
+
+      {lightboxImage && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-sm"
+          onClick={closeLightbox}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
+        >
+          <div className="relative max-w-6xl w-full mx-4" onClick={(e) => e.stopPropagation()}>
+            <div className="absolute -top-10 right-0 flex items-center gap-3">
+              <span className="text-xs text-white/40">
+                {zoomed ? '클릭하여 축소 · 드래그로 이동' : '클릭하여 확대'}
+              </span>
+              <button
+                onClick={closeLightbox}
+                className="flex items-center gap-1.5 text-white/60 hover:text-white text-sm font-medium transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                닫기
+              </button>
+            </div>
+            <div className="overflow-hidden rounded-2xl shadow-2xl flex items-center justify-center">
+              <img
+                src={lightboxImage}
+                alt="확대 이미지"
+                className="max-w-full max-h-[95vh] block select-none"
+                style={{
+                  transform: zoomed ? `translate(${pan.x}px, ${pan.y}px) scale(2)` : 'scale(1)',
+                  transition: dragRef.current ? 'none' : 'transform 0.3s ease',
+                  cursor: zoomed ? (dragRef.current ? 'grabbing' : 'zoom-out') : 'zoom-in',
+                }}
+                onClick={handleImgClick}
+                onMouseDown={handleMouseDown}
+                draggable={false}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeVideo && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 backdrop-blur-sm"
+          onClick={() => setActiveVideo(null)}
+        >
+          <div
+            className="relative w-full max-w-4xl mx-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setActiveVideo(null)}
+              className="absolute -top-10 right-0 flex items-center gap-1.5 text-white/60 hover:text-white text-sm font-medium transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              닫기
+            </button>
+            <div className="aspect-video rounded-2xl overflow-hidden shadow-2xl">
+              <iframe
+                src={`https://www.youtube.com/embed/${activeVideo}?autoplay=1`}
+                className="w-full h-full"
+                allow="autoplay; encrypted-media; fullscreen"
+                allowFullScreen
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      <style jsx global>{`
+        @keyframes blink {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0; }
+        }
+        html { scroll-behavior: smooth; }
+      `}</style>
+    </div>
+  );
+}
