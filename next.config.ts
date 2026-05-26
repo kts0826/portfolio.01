@@ -33,7 +33,7 @@ const securityHeaders = [
       "default-src 'self'",
       "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.youtube.com https://s.ytimg.com",
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob: https://i.ytimg.com https://*.ytimg.com",
+      "img-src 'self' data: blob: https://i.ytimg.com https://*.ytimg.com https://img.youtube.com",
       "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com",
       "connect-src 'self'",
       "font-src 'self'",

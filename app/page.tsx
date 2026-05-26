@@ -242,6 +242,14 @@ export default function Home() {
   const [activeCategory, setActiveCategory] = useState<'전체' | '남성' | '여성' | '제품'>('전체');
   const [emailCopied, setEmailCopied] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const imageWorksRef = useRef<HTMLDivElement>(null);
+
+  const handleCategoryClick = (cat: '전체' | '남성' | '여성' | '제품') => {
+    setActiveCategory(cat);
+    setTimeout(() => {
+      imageWorksRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
+  };
 
   const copyEmail = () => {
     navigator.clipboard.writeText('rlaxotjd0826@gmail.com');
@@ -363,7 +371,7 @@ export default function Home() {
         </div>
 
         {/* 텍스트 (풀너비, z-10) */}
-        <div className="w-full px-6 md:px-[8%] lg:px-[10%] pb-16 relative z-10">
+        <div className="w-full px-6 md:px-[8%] lg:px-[10%] pb-16 pt-20 md:pt-0 relative z-10">
           <p className="text-[#FF2D00] text-[28px] font-bold tracking-[0.4em] uppercase mb-6">
             AI CONTENT CREATOR · 3D ARTIST · VFX
           </p>
@@ -473,6 +481,7 @@ export default function Home() {
           </div>
 
           {/* Image Works */}
+          <div ref={imageWorksRef} />
           <FadeIn>
             <div className="flex flex-col gap-3 mb-4">
               <p className="text-xl font-black italic tracking-tight text-gray-500 uppercase" style={{ fontFamily: "'Barlow Condensed', sans-serif" }}>Image Works</p>
@@ -480,7 +489,7 @@ export default function Home() {
                 {(['전체', '남성', '여성', '제품'] as const).map((cat) => (
                   <button
                     key={cat}
-                    onClick={() => setActiveCategory(cat)}
+                    onClick={() => handleCategoryClick(cat)}
                     className={`px-5 py-2 text-base font-bold tracking-wider transition-all ${
                       activeCategory === cat
                         ? 'bg-[#FF2D00] text-white'
@@ -609,13 +618,13 @@ export default function Home() {
               <div className="border-t border-white/10">
                 {certifications.map((cert, i) => (
                   <FadeIn key={i} delay={i * 40}>
-                    <div className="flex items-center gap-6 py-4 border-b border-white/10 hover:bg-white/[0.02] transition-colors px-2 group">
-                      <span className="text-[23px] font-mono text-gray-700 w-6 flex-shrink-0">{String(i + 1).padStart(2, '0')}</span>
+                    <div className="flex items-center gap-4 py-4 border-b border-white/10 hover:bg-white/[0.02] transition-colors px-2 group">
+                      <span className="text-sm md:text-[23px] font-mono text-gray-700 w-6 flex-shrink-0">{String(i + 1).padStart(2, '0')}</span>
                       <div className="flex-1 min-w-0">
-                        <p className="font-bold text-[19px] text-white group-hover:text-[#FF2D00] transition-colors">{cert.name}</p>
-                        <p className="text-[23px] text-gray-600">{cert.org}</p>
+                        <p className="font-bold text-sm md:text-[19px] text-white group-hover:text-[#FF2D00] transition-colors break-keep">{cert.name}</p>
+                        <p className="text-sm md:text-[19px] text-gray-600 break-keep">{cert.org}</p>
                       </div>
-                      <span className="text-[23px] font-mono text-gray-600 flex-shrink-0">{cert.year}</span>
+                      <span className="text-xs md:text-[19px] font-mono text-gray-600 flex-shrink-0">{cert.year}</span>
                     </div>
                   </FadeIn>
                 ))}
