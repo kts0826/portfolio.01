@@ -395,14 +395,14 @@ export default function Home() {
         <div className="w-full px-6 md:px-[8%] lg:px-[10%]">
           <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-white/10">
             {[
-              { num: '2년 7개월', label: '실무 경험' },
+              { num: '2년\n7개월', label: '실무 경험' },
               { num: '3회', label: '공모전 영상' },
               { num: '6개', label: '자격증 취득' },
               { num: '4가지', label: 'AI 툴 활용' },
             ].map((stat, i) => (
               <FadeIn key={i} delay={i * 80}>
                 <div className="py-10 px-8">
-                  <p className="text-[#FF2D00] font-black mb-1.5" style={{ fontSize: 'clamp(36px, 5vw, 64px)' }}>{stat.num}</p>
+                  <p className="text-[#FF2D00] font-black mb-1.5 whitespace-pre-line" style={{ fontSize: 'clamp(36px, 5vw, 64px)' }}>{stat.num}</p>
                   <p className="text-gray-500 text-sm tracking-wide">{stat.label}</p>
                 </div>
               </FadeIn>
