@@ -163,13 +163,13 @@ const projects = [
     badge: '공모전 영상',
   },
   {
-    emoji: '🎬',
-    title: '체인소맨 레제편 엔딩 크레딧 뮤비',
-    videoId: '3adHcGwlMDI',
-    videoTitle: '체인소맨 : 레제편 엔딩크레딧 뮤비',
-    description: '극장판 엔딩 크레딧의 아쉬움에서 출발해, 크레딧 구간을 영화의 여운이 다시 살아나는 시각적 공간으로 재구성했습니다.\n\n라인아트 기반의 절제된 스타일로 인물의 감정을 중심에 두고, 음악의 호흡에 맞춰 장면 전환을 설계했습니다.',
-    tags: ['ComfyUI', 'Midjourney', 'After Effects', 'Photoshop'],
-    badge: '애니메이션',
+    emoji: '📖',
+    title: '웹 소설 쇼츠 영상',
+    videoId: '7qd5CgUp-rQ',
+    videoTitle: '웹 소설 쇼츠 영상',
+    description: '',
+    tags: ['ComfyUI', 'Midjourney', 'Photoshop', 'After Effects'],
+    badge: '개인 작업물',
   },
 ];
 
@@ -609,7 +609,6 @@ export default function Home() {
                     <p className="text-[19px] text-[#FF2D00]/70 mb-2 break-keep">{item.org}</p>
                     {item.desc && <p className="text-gray-500 text-[19px] leading-relaxed break-keep whitespace-pre-line">{item.desc}</p>}
                   </div>
-                  <ArrowIcon className="w-4 h-4 text-gray-800 group-hover:text-[#FF2D00] transition-colors flex-shrink-0 mt-0.5" />
                 </div>
               </FadeIn>
             ))}
