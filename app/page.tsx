@@ -705,7 +705,7 @@ export default function Home() {
               />
             </div>
             <div
-              className="flex flex-col items-start gap-3 pt-1 flex-shrink-0"
+              className="hidden md:flex flex-col items-start gap-3 pt-1 flex-shrink-0"
               onClick={(e) => e.stopPropagation()}
             >
               <button
