@@ -391,7 +391,7 @@ export default function Home() {
             </p>
             <div className="flex gap-3 flex-shrink-0">
               <a href="#projects" className="px-8 py-3.5 bg-[#FF2D00] hover:bg-[#e02800] transition-colors font-bold text-white text-sm tracking-wide">
-                테스트
+                작품 보기
               </a>
               <a href="#career" className="px-8 py-3.5 border border-white/25 hover:border-white hover:bg-white/5 transition-colors font-bold text-white text-sm tracking-wide">
                 경력 & 이력
