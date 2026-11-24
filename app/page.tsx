@@ -483,7 +483,7 @@ export default function Home() {
               </h3>
             </FadeIn>
             <FadeIn>
-              <p className="mt-4 text-gray-400 text-lg leading-relaxed">제작 기여도 100%</p>
+              <p className="mt-4 text-white text-[28px] leading-relaxed">제작 기여도 100%</p>
             </FadeIn>
           </div>
 
