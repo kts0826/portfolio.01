@@ -141,6 +141,14 @@ const imageSeries = [
     ],
     tags: ['ChatGPT', 'AI 이미지', '제품 페이지', '브랜딩'],
   },
+  {
+    category: '일러스트' as const,
+    title: 'Illustration',
+    subtitle: '일러스트 작업물',
+    description: '이미지를 준비 중입니다.',
+    images: [],
+    tags: [],
+  },
 ];
 
 const projects = [
@@ -239,12 +247,12 @@ export default function Home() {
   useTypingEffect(TYPING_TEXTS);
   const [activeVideo, setActiveVideo] = useState<string | null>(null);
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
-  const [activeCategory, setActiveCategory] = useState<'전체' | '남성' | '여성' | '제품'>('전체');
+  const [activeCategory, setActiveCategory] = useState<'전체' | '남성' | '여성' | '제품' | '일러스트'>('전체');
   const [emailCopied, setEmailCopied] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const imageWorksRef = useRef<HTMLDivElement>(null);
 
-  const handleCategoryClick = (cat: '전체' | '남성' | '여성' | '제품') => {
+  const handleCategoryClick = (cat: '전체' | '남성' | '여성' | '제품' | '일러스트') => {
     setActiveCategory(cat);
     setTimeout(() => {
       if (cat === '전체') {
@@ -493,7 +501,7 @@ export default function Home() {
             <div className="flex flex-col gap-3 mb-4">
               <p className="text-xl font-black italic tracking-tight text-gray-500 uppercase" style={{ fontFamily: "'Barlow Condensed', sans-serif" }}>Image Works</p>
               <div className="flex gap-2 flex-wrap">
-                {(['전체', '남성', '여성', '제품'] as const).map((cat) => (
+                {(['전체', '남성', '여성', '제품', '일러스트'] as const).map((cat) => (
                   <button
                     key={cat}
                     onClick={() => handleCategoryClick(cat)}
