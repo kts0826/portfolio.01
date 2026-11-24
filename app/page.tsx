@@ -152,7 +152,7 @@ const imageSeries = [
       { src: '/works/illustration/illustration-03.png', pos: '50% 50%' },
       { src: '/works/illustration/illustration-04.png', pos: '50% 50%' },
     ],
-    tags: [],
+    tags: ['Midjourney', 'AI 이미지', '일러스트', '커버 일러스트'],
   },
 ];
 
