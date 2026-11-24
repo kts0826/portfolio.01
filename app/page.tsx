@@ -150,6 +150,7 @@ const imageSeries = [
       { src: '/works/illustration/illustration-01.png', pos: '50% 50%' },
       { src: '/works/illustration/illustration-02.png', pos: '50% 50%' },
       { src: '/works/illustration/illustration-03.png', pos: '50% 50%' },
+      { src: '/works/illustration/illustration-04.png', pos: '50% 50%' },
     ],
     tags: [],
   },
