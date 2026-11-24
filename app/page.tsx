@@ -145,8 +145,12 @@ const imageSeries = [
     category: '일러스트' as const,
     title: 'Illustration',
     subtitle: '일러스트 작업물',
-    description: '이미지를 준비 중입니다.',
-    images: [],
+    description: '캐릭터 일러스트 및 웹소설 북커버 작업물.',
+    images: [
+      { src: '/works/illustration/illustration-01.png', pos: '50% 50%' },
+      { src: '/works/illustration/illustration-02.png', pos: '50% 50%' },
+      { src: '/works/illustration/illustration-03.png', pos: '50% 50%' },
+    ],
     tags: [],
   },
 ];
@@ -534,7 +538,7 @@ export default function Home() {
                     </div>
                   </div>
                   <p className="text-gray-500 text-lg mb-5" style={{ wordBreak: 'keep-all' }}>{series.description}</p>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                  <div className={`grid grid-cols-2 gap-2 ${series.images.length === 3 ? 'md:grid-cols-3' : 'md:grid-cols-4'}`}>
                     {series.images.map((img, idx) => (
                       <button
                         key={idx}
