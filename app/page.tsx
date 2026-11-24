@@ -482,6 +482,9 @@ export default function Home() {
                 주요 <span className="text-[#FF2D00]">작업물</span>
               </h3>
             </FadeIn>
+            <FadeIn>
+              <p className="mt-4 text-gray-400 text-lg leading-relaxed">제작 기여도 100%</p>
+            </FadeIn>
           </div>
 
           {/* Image Works */}
